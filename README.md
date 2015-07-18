@@ -1,9 +1,11 @@
-HiChat
+vipchat
 ===
  
 A chat application built with Node.js and socket.io.
 
 View the live demo: http://hichat.herokuapp.com/
+
+base on the hichat, add my own feature p2p future.
 
 Features
 ---
