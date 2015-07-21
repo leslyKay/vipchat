@@ -1,45 +1,45 @@
 /*
- *hichat v0.4.2
- *Wayou Mar 28,2014
+ *vipchat v0.1.1
+ *lesly Jul 28,2015
  *MIT license
- *view on GitHub:https://github.com/wayou/HiChat
- *see it in action:http://hichat.herokuapp.com/
+ *view on GitHub: https://github.com/leslyKay/vipchat
  */
 window.onload = function() {
-    var hichat = new HiChat();
-    hichat.init();
+    var vipchat = new VipChat();
+    vipchat.init();
 };
-var HiChat = function() {
+var VipChat = function() {
     this.socket = null;
 };
-HiChat.prototype = {
+VipChat.prototype = {
     init: function() {
         var that = this;
         this.socket = io.connect();
         this.socket.on('connect', function() {
-            document.getElementById('info').textContent = 'get yourself a nickname :)';
+            document.getElementById('info').textContent = '给自己一个身份：';
             document.getElementById('nickWrapper').style.display = 'block';
             document.getElementById('nicknameInput').focus();
         });
         this.socket.on('nickExisted', function() {
-            document.getElementById('info').textContent = '!nickname is taken, choose another pls';
+            document.getElementById('info').textContent = '昵称已经被抢占了，换一个试试..';
         });
         this.socket.on('loginSuccess', function() {
-            document.title = 'hichat | ' + document.getElementById('nicknameInput').value;
+            document.title = 'vipchat | ' + document.getElementById('nicknameInput').value;
             document.getElementById('loginWrapper').style.display = 'none';
             document.getElementById('messageInput').focus();
         });
         this.socket.on('error', function(err) {
             if (document.getElementById('loginWrapper').style.display == 'none') {
-                document.getElementById('status').textContent = '!fail to connect :(';
+                document.getElementById('status').textContent = '!连接失败 :(';
             } else {
-                document.getElementById('info').textContent = '!fail to connect :(';
+                document.getElementById('info').textContent = '!连接失败 :(';
             }
         });
         this.socket.on('system', function(nickName, userCount, type) {
-            var msg = nickName + (type == 'login' ? ' joined' : ' left');
-            that._displayNewMsg('system ', msg, 'red');
-            document.getElementById('status').textContent = userCount + (userCount > 1 ? ' users' : ' user') + ' online';
+            var msg = nickName + (type == 'login' ? ' 加入聊天' : ' 离开聊天');
+            that._displayNewMsg('系统消息', msg, 'red', true);
+            var str = '有 ' + userCount + (userCount > 1 ? ' 个用户同时' : ' 个用户') + '在线，欢迎回来聊天：'+nickName;
+            document.getElementById('status').textContent = str;
         });
         this.socket.on('newMsg', function(user, msg, color) {
             that._displayNewMsg(user, msg, color);
@@ -123,6 +123,7 @@ HiChat.prototype = {
             if (target.nodeName.toLowerCase() == 'img') {
                 var messageInput = document.getElementById('messageInput');
                 messageInput.focus();
+                var emojiImg = that._showEmoji('[emoji:' + target.title + ']');
                 messageInput.value = messageInput.value + '[emoji:' + target.title + ']';
             };
         }, false);
@@ -138,14 +139,19 @@ HiChat.prototype = {
         };
         emojiContainer.appendChild(docFragment);
     },
-    _displayNewMsg: function(user, msg, color) {
+    _displayNewMsg: function(user, msg, color, brFlag) {
         var container = document.getElementById('historyMsg'),
             msgToDisplay = document.createElement('p'),
             date = new Date().toTimeString().substr(0, 8),
             //determine whether the msg contains emoji
             msg = this._showEmoji(msg);
         msgToDisplay.style.color = color || '#000';
-        msgToDisplay.innerHTML = user + '<span class="timespan">(' + date + '): </span>' + msg;
+        if (!brFlag) {
+            msgToDisplay.innerHTML = user + '<span class="timespan">(' + date + '): </span><br> <div class="messageBody">' + msg + '</div>';
+        } else {
+            msgToDisplay.innerHTML = user + '<span class="timespan">(' + date + '): ' + msg + '</span>';
+        }
+
         container.appendChild(msgToDisplay);
         container.scrollTop = container.scrollHeight;
     },
@@ -168,7 +174,7 @@ HiChat.prototype = {
             if (emojiIndex > totalEmojiNum) {
                 result = result.replace(match[0], '[X]');
             } else {
-                result = result.replace(match[0], '<img class="emoji" src="../content/emoji/' + emojiIndex + '.gif" />');//todo:fix this in chrome it will cause a new request for the image
+                result = result.replace(match[0], '<img class="emoji" src="../content/emoji/' + emojiIndex + '.gif" />'); //todo:fix this in chrome it will cause a new request for the image
             };
         };
         return result;
