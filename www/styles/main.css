@@ -48,7 +48,7 @@ html, body {
     max-width: 99%;
 }
 .timespan {
-    color: #ddd;
+    color: rgb(4, 10, 255);
 }
 .items {
     height: 30px;
@@ -71,7 +71,9 @@ html, body {
     overflow: hidden;
 }
 /*end custom file input*/
-
+.messageBody{
+    padding-top: 6px;
+}
 #messageInput {
     width: 440px;
     max-width: 440px;
