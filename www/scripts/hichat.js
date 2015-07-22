@@ -47,6 +47,11 @@ VipChat.prototype = {
         this.socket.on('newImg', function(user, img, color) {
             that._displayImage(user, img, color);
         });
+        //private message
+        this.socket.on('private message',function(nickname, msg){
+            that._displayNewMsg(nickname, msg);
+        });
+
         document.getElementById('loginBtn').addEventListener('click', function() {
             var nickName = document.getElementById('nicknameInput').value;
             if (nickName.trim().length != 0) {

@@ -1,15 +1,35 @@
 {
-    "name": "vipchat",
-    "description": "a realtime chat web application",
-    "version": "0.4.0",
-    "main": "server.js",
-    "dependencies": {
-        "express": "3.4.x",
-        "socket.io": "0.9.x",
-        "mysql":"*"
-    },
-    "engines": {
-        "node": "0.10.x",
-        "npm": "1.2.x"
-    }
+  "name": "lesly",
+  "description": "a realtime chat web application",
+  "version": "0.1.1",
+  "main": "server.js",
+  "dependencies": {
+    "express": "3.4.x",
+    "socket.io": "0.9.x",
+    "connect":"2.9.0"
+  },
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.2.x",
+    "cookie-parser": "~1.0.1",
+    "body-parser": "~1.0.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leslyKay/vipchat.git"
+  },
+  "keywords": [
+    "vipchat"
+  ],
+  "author": "leslyKay",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leslyKay/vipchat/issues"
+  },
+  "homepage": "https://github.com/leslyKay/vipchat#readme"
 }
+
