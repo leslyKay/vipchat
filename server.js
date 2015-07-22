@@ -26,10 +26,7 @@ app.configure(function(){
 });
 
 //specify the html we will use
-app.use('/', function(req,res) {
-    var cu = req.session.user;
-    express.static(__dirname + '/www');
-});
+app.use('/',   express.static(__dirname + '/www'));
 //bind the server to the 80 port
 //server.listen(3000);//for local test
 server.listen(process.env.PORT || 3000);//publish to heroku
