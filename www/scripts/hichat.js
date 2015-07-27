@@ -76,6 +76,7 @@ VipChat.prototype = {
             messageInput.focus();
             if (msg.trim().length != 0) {
                 that.socket.emit('postMsg', msg, color);
+                //that.socket.emit('postMsg', 'lesly', msg);
                 that._displayNewMsg('me', msg, color);
                 return;
             };

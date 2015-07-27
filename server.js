@@ -1,4 +1,4 @@
-var express = require('express'),
+ var express = require('express'),
     app = express(),
     server = require('http').createServer(app),
     io = require('socket.io').listen(server),
@@ -14,7 +14,7 @@ var sessionStore = require('sessionstore').createSessionStore();
 /**
  * 私人聊天使用session
  */
-var usersWS = {};
+var usersWS = [];
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -47,10 +47,8 @@ io.configure(function(){
 //handle the socket
 io.sockets.on('connection', function(socket) {
     var session = socket.handshake.session;
-    var sessionId = session.id;
-    usersWS[sessionId] = socket;
     if(session){
-        console.log("sessionId : " + sessionId);
+        console.log("sessionId : " + session.id);
     }else{
         console.log("session is null");
     }
@@ -63,6 +61,14 @@ io.sockets.on('connection', function(socket) {
             socket.userIndex = users.length;
             socket.nickname = nickname;
             users.push(nickname);
+
+            session.nickname = nickname;
+            var obj = {};
+            obj.sessionId = session.id;
+            obj.nickname = nickname;
+            obj.socket = socket;
+            usersWS.push(obj);
+
             socket.emit('loginSuccess');
             io.sockets.emit('system', nickname, users.length, 'login');
         };
@@ -82,12 +88,17 @@ io.sockets.on('connection', function(socket) {
     });
 
     //私人@信息
-    socket.on('private message',function(to, msg, fn){
-        var target = usersWS[to];
-        if (target) {
-            target.broadcast.emit('private message', name+'[私信]', msg);
+    socket.on('private message',function(to, msg){
+        var target;
+        for(obj in usersWS){
+            if(to == obj.nickname){
+                target = obj.socket;
+                break;
+            }
         }
-        else {
+        if (target) {
+            target.broadcast.emit('newImg', name+'[私信]', msg);
+        }else {
             socket.broadcast.emit('message error', to, msg);
         }
     });

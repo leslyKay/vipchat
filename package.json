@@ -6,7 +6,9 @@
   "dependencies": {
     "express": "3.4.x",
     "socket.io": "0.9.x",
-    "connect":"2.9.0"
+    "connect":"2.9.0",
+    "session.io":"1.0.0",
+    "sessionstore":"1.2.3"
   },
   "engines": {
     "node": "0.10.x",
