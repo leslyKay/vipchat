@@ -52,39 +52,81 @@ io.sockets.on('connection', function(socket) {
     }else{
         console.log("session is null");
     }
-   
+    //根据socket id 获取用户信息
+    var user = {};
+    
+    function setUser(){
+        for(var i in usersWS){
+            if(usersWS[i].sessionId == session.id){
+                user = usersWS[i];
+            }
+        }
+    }
     //new user login
     socket.on('login', function(nickname) {
-        if (users.indexOf(nickname) > -1) {
-            socket.emit('nickExisted');
-        } else {
-            socket.userIndex = users.length;
-            socket.nickname = nickname;
-            users.push(nickname);
 
-            session.nickname = nickname;
-            var obj = {};
-            obj.sessionId = session.id;
-            obj.nickname = nickname;
-            obj.socket = socket;
-            usersWS.push(obj);
+            //检查sessionid是否存在数组
+            var flag = false;
+            var currentUser={};
+            for(var os in usersWS){
+                if(usersWS[os].sessionId == session.id){
+                    flag = true;
+                    currentUser = usersWS[os];
+                }
+            }
 
-            socket.emit('loginSuccess');
-            io.sockets.emit('system', nickname, users.length, 'login');
-        };
+            if(!nickname){
+                socket.emit('clientLogin',currentUser.nickname);
+                if(flag){
+                    currentUser.socketList.push(socket);
+                    io.sockets.emit('system', currentUser.nickname, usersWS.length, 'login');
+                }
+                return ;
+            }
+            if(users.indexOf(nickname) > -1){ //登陆过的
+                socket.emit('nickExisted');
+                return ;
+            }
+
+            if(!flag){ //第一次登陆
+                    //todo 找出该session的nickname传到前台
+                    socket.userIndex = users.length;
+                    users.push(nickname);
+
+                    var obj = {};
+                    obj.sessionId = session.id;
+                    obj.nickname = nickname;
+                    obj.socketList = [];
+                    obj.socketList.push(socket);
+                    usersWS.push(obj);
+                    socket.emit('loginSuccess');
+                    io.sockets.emit('system', nickname, usersWS.length, 'login');
+            }
+            
     });
     //user leaves
     socket.on('disconnect', function() {
-        users.splice(socket.userIndex, 1);
-        socket.broadcast.emit('system', socket.nickname, users.length, 'logout');
+        //users.splice(socket.userIndex, 1);
+        setUser();
+        var socketList = user.socketList;
+        if(socketList){
+            for(var i=0; i<socketList.length; i++){
+                if(socketList[i].id == socket.id){
+                    socketList.splice(i,1);
+                }
+            }
+        }
+        socket.broadcast.emit('system', user.nickname, usersWS.length, 'logout');
     });
     //new message get
     socket.on('postMsg', function(msg, color) {
-        socket.broadcast.emit('newMsg', socket.nickname, msg, color);
+        setUser();
+        socket.broadcast.emit('newMsg', user.nickname, msg, color);
     });
     //new image get
     socket.on('img', function(imgData, color) {
-        socket.broadcast.emit('newImg', socket.nickname, imgData, color);
+        setUser();
+        socket.broadcast.emit('newImg', user.nickname, imgData, color);
     });
 
     //私人@信息
