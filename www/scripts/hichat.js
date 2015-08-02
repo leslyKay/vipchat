@@ -10,7 +10,6 @@ window.onload = function() {
 };
 var VipChat = function() {
     this.socket = null;
-    this.currentUserName = null;
 };
 VipChat.prototype = {
     init: function() {
@@ -32,7 +31,7 @@ VipChat.prototype = {
         this.socket.on('clientLogin',function(nickname){
             if(nickname){
                 document.title = 'vipchat | ' + nickname;
-                this.currentUserName = nickname;
+                document.getElementById('nicknameInput').value = nickname;
                 document.getElementById('loginWrapper').style.display = 'none';
                 document.getElementById('messageInput').focus();
             }else{
@@ -61,7 +60,7 @@ VipChat.prototype = {
         this.socket.on('system', function(nickName, userCount, type) {
             var msg = nickName + (type == 'login' ? ' 加入聊天' : ' 离开聊天');
             that._displayNewMsg('系统消息', msg, 'red', true);
-            var localUserName = this.currentUserName;
+            var localUserName =  document.getElementById('nicknameInput').value;
             if(!localUserName){
                 localUserName = nickName;
             }

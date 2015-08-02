@@ -56,9 +56,11 @@ io.sockets.on('connection', function(socket) {
     var user = {};
     
     function setUser(){
+        var userIndex;
         for(var i in usersWS){
             if(usersWS[i].sessionId == session.id){
                 user = usersWS[i];
+                userIndex = i;
             }
         }
     }
@@ -107,13 +109,18 @@ io.sockets.on('connection', function(socket) {
     //user leaves
     socket.on('disconnect', function() {
         //users.splice(socket.userIndex, 1);
-        setUser();
+        var index = setUser();
         var socketList = user.socketList;
         if(socketList){
             for(var i=0; i<socketList.length; i++){
                 if(socketList[i].id == socket.id){
                     socketList.splice(i,1);
+                    break;
                 }
+            }
+            if(socketList.length == 0){
+                usersWS.splice(index,1);
+                users.splice(index,1);
             }
         }
         socket.broadcast.emit('system', user.nickname, usersWS.length, 'logout');
