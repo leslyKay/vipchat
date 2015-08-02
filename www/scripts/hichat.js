@@ -62,6 +62,9 @@ VipChat.prototype = {
             var msg = nickName + (type == 'login' ? ' 加入聊天' : ' 离开聊天');
             that._displayNewMsg('系统消息', msg, 'red', true);
             var localUserName = this.currentUserName;
+            if(!localUserName){
+                localUserName = nickName;
+            }
             var str = '有 ' + userCount + (userCount > 1 ? ' 个用户同时' : ' 个用户') + '在线，欢迎回来聊天：'+localUserName;
             document.getElementById('status').textContent = str;
         });
