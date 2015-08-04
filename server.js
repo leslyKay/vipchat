@@ -1,4 +1,4 @@
-var express = require('express'),
+ var express = require('express'),
     app = express(),
     server = require('http').createServer(app),
     io = require('socket.io').listen(server),
@@ -14,7 +14,7 @@ var sessionStore = require('sessionstore').createSessionStore();
 /**
  * 私人聊天使用session
  */
-var usersWS = {};
+var usersWS = [];
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -47,47 +47,107 @@ io.configure(function(){
 //handle the socket
 io.sockets.on('connection', function(socket) {
     var session = socket.handshake.session;
-    var sessionId = session.id;
-    usersWS[sessionId] = socket;
     if(session){
-        console.log("sessionId : " + sessionId);
+        console.log("sessionId : " + session.id);
     }else{
         console.log("session is null");
     }
-   
+    //根据socket id 获取用户信息
+    var user = {};
+    
+    function setUser(){
+        var userIndex;
+        for(var i in usersWS){
+            if(usersWS[i].sessionId == session.id){
+                user = usersWS[i];
+                userIndex = i;
+            }
+        }
+    }
     //new user login
     socket.on('login', function(nickname) {
-        if (users.indexOf(nickname) > -1) {
-            socket.emit('nickExisted');
-        } else {
-            socket.userIndex = users.length;
-            socket.nickname = nickname;
-            users.push(nickname);
-            socket.emit('loginSuccess');
-            io.sockets.emit('system', nickname, users.length, 'login');
-        };
+
+            //检查sessionid是否存在数组
+            var flag = false;
+            var currentUser={};
+            for(var os in usersWS){
+                if(usersWS[os].sessionId == session.id){
+                    flag = true;
+                    currentUser = usersWS[os];
+                }
+            }
+
+            if(!nickname){
+                socket.emit('clientLogin',currentUser.nickname);
+                if(flag){
+                    currentUser.socketList.push(socket);
+                    io.sockets.emit('system', currentUser.nickname, usersWS.length, 'login');
+                }
+                return ;
+            }
+            if(users.indexOf(nickname) > -1){ //登陆过的
+                socket.emit('nickExisted');
+                return ;
+            }
+
+            if(!flag){ //第一次登陆
+                    //todo 找出该session的nickname传到前台
+                    socket.userIndex = users.length;
+                    users.push(nickname);
+
+                    var obj = {};
+                    obj.sessionId = session.id;
+                    obj.nickname = nickname;
+                    obj.socketList = [];
+                    obj.socketList.push(socket);
+                    usersWS.push(obj);
+                    socket.emit('loginSuccess');
+                    io.sockets.emit('system', nickname, usersWS.length, 'login');
+            }
+            
     });
     //user leaves
     socket.on('disconnect', function() {
-        users.splice(socket.userIndex, 1);
-        socket.broadcast.emit('system', socket.nickname, users.length, 'logout');
+        //users.splice(socket.userIndex, 1);
+        var index = setUser();
+        var socketList = user.socketList;
+        if(socketList){
+            for(var i=0; i<socketList.length; i++){
+                if(socketList[i].id == socket.id){
+                    socketList.splice(i,1);
+                    break;
+                }
+            }
+            if(socketList.length == 0){
+                usersWS.splice(index,1);
+                users.splice(index,1);
+            }
+        }
+        socket.broadcast.emit('system', user.nickname, usersWS.length, 'logout');
     });
     //new message get
     socket.on('postMsg', function(msg, color) {
-        socket.broadcast.emit('newMsg', socket.nickname, msg, color);
+        setUser();
+        socket.broadcast.emit('newMsg', user.nickname, msg, color);
     });
     //new image get
     socket.on('img', function(imgData, color) {
-        socket.broadcast.emit('newImg', socket.nickname, imgData, color);
+        setUser();
+        socket.broadcast.emit('newImg', user.nickname, imgData, color);
     });
 
     //私人@信息
-    socket.on('private message',function(to, msg, fn){
-        var target = usersWS[to];
-        if (target) {
-            target.broadcast.emit('private message', name+'[私信]', msg);
+    socket.on('private message',function(to, msg){
+        var target;
+        for(obj in usersWS){
+            if(to == obj.nickname){
+                target = obj.socket;
+                break;
+            }
         }
-        else {
+        if (target) {
+            target.broadcast.emit('newImg', name+'[私信]', msg);
+        }else {
             socket.broadcast.emit('message error', to, msg);
         }
     });

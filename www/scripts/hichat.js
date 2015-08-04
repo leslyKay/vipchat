@@ -16,12 +16,34 @@ VipChat.prototype = {
         var that = this;
         this.socket = io.connect();
         this.socket.on('connect', function() {
-            document.getElementById('info').textContent = '给自己一个身份：';
-            document.getElementById('nickWrapper').style.display = 'block';
-            document.getElementById('nicknameInput').focus();
+            /*var currentUserName = that.socket.nickname;
+            //获取当前的session，用this
+            if(!currentUserName){
+                document.getElementById('info').textContent = '给自己一个身份：';
+                document.getElementById('nickWrapper').style.display = 'block';
+                document.getElementById('nicknameInput').focus();
+            }else{
+                //用之前已登录的socket，用that，与下方登陆的socket一致
+                that.socket.emit('login', currentUserName);
+            }*/
+            that.socket.emit('login', '');
+        });
+        this.socket.on('clientLogin',function(nickname){
+            if(nickname){
+                document.title = 'vipchat | ' + nickname;
+                document.getElementById('nicknameInput').value = nickname;
+                document.getElementById('loginWrapper').style.display = 'none';
+                document.getElementById('messageInput').focus();
+            }else{
+                document.getElementById('info').textContent = '给自己一个身份：';
+                document.getElementById('nickWrapper').style.display = 'block';
+                document.getElementById('nicknameInput').focus();
+            }
         });
         this.socket.on('nickExisted', function() {
             document.getElementById('info').textContent = '昵称已经被抢占了，换一个试试..';
+            document.getElementById('nickWrapper').style.display = 'block';
+            document.getElementById('nicknameInput').focus();
         });
         this.socket.on('loginSuccess', function() {
             document.title = 'vipchat | ' + document.getElementById('nicknameInput').value;
@@ -38,7 +60,11 @@ VipChat.prototype = {
         this.socket.on('system', function(nickName, userCount, type) {
             var msg = nickName + (type == 'login' ? ' 加入聊天' : ' 离开聊天');
             that._displayNewMsg('系统消息', msg, 'red', true);
-            var str = '有 ' + userCount + (userCount > 1 ? ' 个用户同时' : ' 个用户') + '在线，欢迎回来聊天：'+nickName;
+            var localUserName =  document.getElementById('nicknameInput').value;
+            if(!localUserName){
+                localUserName = nickName;
+            }
+            var str = '有 ' + userCount + (userCount > 1 ? ' 个用户同时' : ' 个用户') + '在线，欢迎回来聊天：'+localUserName;
             document.getElementById('status').textContent = str;
         });
         this.socket.on('newMsg', function(user, msg, color) {
@@ -76,6 +102,7 @@ VipChat.prototype = {
             messageInput.focus();
             if (msg.trim().length != 0) {
                 that.socket.emit('postMsg', msg, color);
+                //that.socket.emit('postMsg', 'lesly', msg);
                 that._displayNewMsg('me', msg, color);
                 return;
             };
