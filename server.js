@@ -42,6 +42,7 @@ app.use('/exportWord', function(req,res){
     for(var os in usersWS){
             if(usersWS[os].sessionId == req.session.id){
                 cuser = usersWS[os];
+                break;
             }
     }
     exportWord.exportWord(req,res,cuser.nickname);
@@ -71,7 +72,7 @@ io.sockets.on('connection', function(socket) {
     function setUser(){
         var userIndex;
         for(var i in usersWS){
-            if(usersWS[i].sessionId == session.id){
+            if(session && session.id && usersWS[i].sessionId == session.id){
                 user = usersWS[i];
                 userIndex = i;
             }
@@ -154,8 +155,8 @@ io.sockets.on('connection', function(socket) {
     });
 
     //私人@信息
-    socket.on('private message',function(to, msg){
-        var target;
+    socket.on('private_message',function(username, msg){
+        /*var target;
         for(obj in usersWS){
             if(to == obj.nickname){
                 target = obj.socket;
@@ -166,6 +167,19 @@ io.sockets.on('connection', function(socket) {
             target.emit('newImg', name+'[私信]', msg);
         }else {
             socket.broadcast.emit('message error', to, msg);
+        }*/
+        //socket.emit('system','123', 111 , 'login');
+        var cuser = {};
+        for(var os in usersWS){
+            if(usersWS[os].nickname == username){
+                cuser = usersWS[os];
+                for(var s in cuser.socketList){
+                    //cuser.socketList[s].emit('private_message', 'test_private_msg', 'first private message ');
+                    cuser.socketList[s].emit('private_message', username , '有人@你了，暂停一下');
+                    //socket.emit('system','123', 10 , 'login');
+                }
+                break;
+            }
         }
     });
 

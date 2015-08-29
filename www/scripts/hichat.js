@@ -76,8 +76,9 @@ VipChat.prototype = {
             that._displayImage(user, img, color);
         });
         //private message
-        this.socket.on('private message',function(nickname, msg){
+        this.socket.on('private_message',function(nickname, msg){
             that._displayNewMsg(nickname, msg);
+            //alert(msg);
         });
 
         document.getElementById('loginBtn').addEventListener('click', function() {
@@ -164,6 +165,10 @@ VipChat.prototype = {
         //导出
         document.getElementById('exportChat').addEventListener('click',function(e){
             window.open('/exportWord');
+        });
+        //私信
+        document.getElementById('privateMsg').addEventListener('click',function(e){
+            that.socket.emit('private_message', '123', '私信。。。');
         });
     },
     _initialEmoji: function() {
