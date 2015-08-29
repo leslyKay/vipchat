@@ -4,7 +4,9 @@
     io = require('socket.io').listen(server),
     sessionIo = require('session.io'),
     users = [];
- 
+ var db = require('./db');
+ var exportWord = require('./test/testExportWord');
+
 //Setup cookie and session handlers
 //Note: for sessionStore you can use any sessionStore module that has the .load() function
 //but I personally use the module 'sessionstore' to handle my sessionStores.
@@ -33,6 +35,17 @@ server.listen(process.env.PORT || 3000);//publish to heroku
 
 //server.listen(process.env.OPENSHIFT_NODEJS_PORT || 3000);//publish to openshift
 //console.log('server started on port'+process.env.PORT || 3000);
+
+//test export word
+app.use('/exportWord', function(req,res){
+    var cuser={};
+    for(var os in usersWS){
+            if(usersWS[os].sessionId == req.session.id){
+                cuser = usersWS[os];
+            }
+    }
+    exportWord.exportWord(req,res,cuser.nickname);
+});
 
 server.listen(app.get('port'), function(){
   console.log('Listening on port ' + app.get('port'));
@@ -103,6 +116,10 @@ io.sockets.on('connection', function(socket) {
                     usersWS.push(obj);
                     socket.emit('loginSuccess');
                     io.sockets.emit('system', nickname, usersWS.length, 'login');
+                    //加入数据库 test
+                    /*db.executeSql('insert into t_user(username, email, nickname, password) value(?,?,?,?)',['test','test@126.com','test','test'],function(err,results){ 
+                        console.log("add record to db");
+                    });*/
             }
             
     });
@@ -146,7 +163,7 @@ io.sockets.on('connection', function(socket) {
             }
         }
         if (target) {
-            target.broadcast.emit('newImg', name+'[私信]', msg);
+            target.emit('newImg', name+'[私信]', msg);
         }else {
             socket.broadcast.emit('message error', to, msg);
         }

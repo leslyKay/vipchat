@@ -59,8 +59,10 @@ VipChat.prototype = {
         });
         this.socket.on('system', function(nickName, userCount, type) {
             var msg = nickName + (type == 'login' ? ' 加入聊天' : ' 离开聊天');
-            that._displayNewMsg('系统消息', msg, 'red', true);
             var localUserName =  document.getElementById('nicknameInput').value;
+            if(nickName != localUserName){
+                that._displayNewMsg('系统消息', msg, 'red', true);
+            }
             if(!localUserName){
                 localUserName = nickName;
             }
@@ -159,6 +161,10 @@ VipChat.prototype = {
                 messageInput.value = messageInput.value + '[emoji:' + target.title + ']';
             };
         }, false);
+        //导出
+        document.getElementById('exportChat').addEventListener('click',function(e){
+            window.open('/exportWord');
+        });
     },
     _initialEmoji: function() {
         var emojiContainer = document.getElementById('emojiWrapper'),

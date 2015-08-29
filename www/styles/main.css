@@ -10,6 +10,12 @@ html, body {
     margin: 0 auto;
     background-color: #ddd;
 }
+.product_name{
+    text-align: center;
+    font-family: fantasy;
+    font-size: xx-large;
+    margin-bottom: 8px;
+}
 #loginWrapper {
     position: fixed;
     top: 0;

@@ -9,7 +9,9 @@
     "connect":"2.9.0",
     "session.io":"1.0.0",
     "sessionstore":"1.2.3",
-    "mysql":"2.8.0"
+    "mysql":"2.8.0",
+    "officegen":"0.2.9",
+    "async":"1.4.2"
   },
   "engines": {
     "node": "0.10.x",

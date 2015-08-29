@@ -14,7 +14,7 @@
     <body>
         <div class="wrapper">
             <div class="banner">
-                <h1>vipchat</h1>
+                <div class="product_name">vipchat</div>
                 <span id="status"></span>
             </div>
             <div id="historyMsg">
@@ -24,10 +24,11 @@
                     <input id="colorStyle" type="color" placeHolder='#000' title="字体颜色" />
                     <input id="emoji" type="button" value="表情" title="表情" />
                     <label for="sendImage" class="imageLable">
-                        <input type="button" value="图片"  />
+                        <input type="button" value="图片" title="图片"/>
                         <input id="sendImage" type="file" value="image"/>
                     </label>
-                    <input id="clearBtn" type="button" value="清空" title="clear screen" />
+                    <input id="clearBtn" type="button" value="清空" title="清空屏幕聊天记录" />
+                    <input id="exportChat" type="button" value="导出" title="导出聊天记录" />
                 </div>
                 <textarea id="messageInput" placeHolder="输入你想说的话..."></textarea>
                 <input id="sendBtn" type="button" value="发送">
