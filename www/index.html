@@ -11,7 +11,7 @@
         <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
         <link rel="icon" href="favicon.ico" type="image/x-icon">
     </head>
-    <body>
+    <body class="bgAllImage">
         <div class="wrapper">
             <div class="banner">
                 <div class="product_name">vipchat</div>
@@ -34,6 +34,9 @@
                 <input id="sendBtn" type="button" value="发送">
                 <div id="emojiWrapper">
                 </div>
+                <footer>
+                    <small>view on <a href="https://github.com/leslyKay/vipchat">GitHub</a> | <a href="mailto:leslytt@126.com">contact me</a></small>
+                </footer>
             </div>
         </div>
         <div id="loginWrapper">
@@ -43,9 +46,7 @@
                 <input type="button" value="确定" id="loginBtn" />
             </div>
         </div>
-        <footer>
-            <small>view on <a href="https://github.com/leslyKay/vipchat">GitHub</a> | <a href="mailto:leslytt@126.com">contact me</a></small>
-        </footer>
+        
         <script src="/socket.io/socket.io.js"></script>
         <script src="scripts/hichat.js"></script>
         <script>
