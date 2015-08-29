@@ -71,7 +71,7 @@ VipChat.prototype = {
         });
         this.socket.on('newMsg', function(user, msg, color) {
             that._displayNewMsg(user, msg, color);
-        });
+        }); 
         this.socket.on('newImg', function(user, img, color) {
             that._displayImage(user, img, color);
         });
