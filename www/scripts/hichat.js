@@ -106,7 +106,7 @@ VipChat.prototype = {
             if (msg.trim().length != 0) {
                 that.socket.emit('postMsg', msg, color);
                 //that.socket.emit('postMsg', 'lesly', msg);
-                that._displayNewMsg('me', msg, color);
+                that._displayNewMsg('我', msg, color);
                 return;
             };
         }, false);
@@ -117,7 +117,7 @@ VipChat.prototype = {
             if (e.keyCode == 13 && msg.trim().length != 0) {
                 messageInput.value = '';
                 that.socket.emit('postMsg', msg, color);
-                that._displayNewMsg('me', msg, color);
+                that._displayNewMsg('我', msg, color);
             };
         }, false);
         document.getElementById('clearBtn').addEventListener('click', function() {
@@ -136,7 +136,7 @@ VipChat.prototype = {
                 reader.onload = function(e) {
                     this.value = '';
                     that.socket.emit('img', e.target.result, color);
-                    that._displayImage('me', e.target.result, color);
+                    that._displayImage('我', e.target.result, color);
                 };
                 reader.readAsDataURL(file);
             };

@@ -61,6 +61,7 @@ io.configure(function(){
 //handle the socket
 io.sockets.on('connection', function(socket) {
     var session = socket.handshake.session;
+    var ip = socket.handshake.address.address;
     if(session){
         console.log("sessionId : " + session.id);
     }else{
@@ -78,6 +79,13 @@ io.sockets.on('connection', function(socket) {
             }
         }
     }
+
+    function addRecord(params){
+        db.executeSql('insert into chat_record(user_name, ip, message, message_type) value(?,?,?,?)', params ,function(err,results){ 
+                        console.log("add record to db");
+        });
+    }
+
     //new user login
     socket.on('login', function(nickname) {
 
@@ -121,6 +129,8 @@ io.sockets.on('connection', function(socket) {
                     /*db.executeSql('insert into t_user(username, email, nickname, password) value(?,?,?,?)',['test','test@126.com','test','test'],function(err,results){ 
                         console.log("add record to db");
                     });*/
+                    var params = [nickname, ip  ,  nickname+' login', 3];
+                    addRecord(params);
             }
             
     });
@@ -141,43 +151,39 @@ io.sockets.on('connection', function(socket) {
                 users.splice(index,1);
             }
         }
-        socket.broadcast.emit('system', user.nickname, usersWS.length, 'logout');
+        socket.broadcast.emit('system', user.nickname, usersWS.length, ' logout');
+        var params = [user.nickname, ip  ,  user.nickname + ' logout', 3];
+        addRecord(params);
     });
     //new message get
     socket.on('postMsg', function(msg, color) {
         setUser();
         socket.broadcast.emit('newMsg', user.nickname, msg, color);
+        var params = [user.nickname, ip  ,  msg , 1];
+        addRecord(params);
     });
     //new image get
     socket.on('img', function(imgData, color) {
         setUser();
         socket.broadcast.emit('newImg', user.nickname, imgData, color);
+        var params = [user.nickname, ip  ,  imgData , 1];
+        addRecord(params);
     });
 
     //私人@信息
     socket.on('private_message',function(username, msg){
-        /*var target;
-        for(obj in usersWS){
-            if(to == obj.nickname){
-                target = obj.socket;
-                break;
-            }
-        }
-        if (target) {
-            target.emit('newImg', name+'[私信]', msg);
-        }else {
-            socket.broadcast.emit('message error', to, msg);
-        }*/
         //socket.emit('system','123', 111 , 'login');
         var cuser = {};
         for(var os in usersWS){
             if(usersWS[os].nickname == username){
                 cuser = usersWS[os];
                 for(var s in cuser.socketList){
-                    //cuser.socketList[s].emit('private_message', 'test_private_msg', 'first private message ');
-                    cuser.socketList[s].emit('private_message', username , '有人@你了，暂停一下');
+                    var msg = '有人@你了，暂停一下';
+                    cuser.socketList[s].emit('private_message', username , msg);
                     //socket.emit('system','123', 10 , 'login');
                 }
+                var params = [username, ip  ,  msg , 4];
+                addRecord(params);
                 break;
             }
         }
