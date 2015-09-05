@@ -57,7 +57,7 @@ html, body {
     position: relative;
 }
 #historyMsg {
-    height: 400px;
+    height: 62%;
     background-color: #fff;
     overflow: auto;
     padding: 2px;

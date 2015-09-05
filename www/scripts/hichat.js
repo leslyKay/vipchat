@@ -170,6 +170,26 @@ VipChat.prototype = {
         document.getElementById('privateMsg').addEventListener('click',function(e){
             that.socket.emit('private_message', '123', '私信。。。');
         });
+        //屏幕截图
+        document.getElementById('cutPicture').addEventListener('click',function(e){
+             event.preventDefault();
+                html2canvas(document.body, {
+                allowTaint: true,
+                taintTest: false,
+                onrendered: function(canvas) {
+                    canvas.id = "mycanvas";
+                    //document.body.appendChild(canvas);
+                    //生成base64图片数据
+                    var dataUrl = canvas.toDataURL();
+                    var newImg = document.createElement("img");
+                    /*newImg.src =  dataUrl;
+                    document.body.appendChild(newImg);*/
+                    var color = document.getElementById('colorStyle').value;
+                    that.socket.emit('img', dataUrl, color);
+                    that._displayImage('我', dataUrl, color);
+                }
+            });
+        });
     },
     _initialEmoji: function() {
         var emojiContainer = document.getElementById('emojiWrapper'),

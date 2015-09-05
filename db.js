@@ -13,6 +13,8 @@ var option = {
     database: db_name
 };
  
+var pool = mysql.createPool(option);
+
 function _exec(sqls,values,after) {
     var client = mysql.createConnection(option);
     client.connect(function(err){
