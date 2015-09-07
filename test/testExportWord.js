@@ -27,7 +27,7 @@ exports.exportWord = function(req, res, nickName) {
 		(date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() ;
 	}
 
-	db.executeSql(' select user_name as userName, message_time as messageTime, message as message, message_type as messageType from chat_record where message_type != 3', [], function(err, results) {
+	db.executeSql(' select user_name as userName, message_time as messageTime, message as message, message_type as messageType from chat_record where message_type != 3 AND message_time >= CURDATE()', [], function(err, results) {
 
 		console.info(results);
 
